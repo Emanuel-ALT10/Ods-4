@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kahoot ODS 4 - Multiplayer</title>
+    <meta name="theme-color" content="#46178f">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <!-- Background Animated Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-triangle"></div>
+        <div class="shape shape-diamond"></div>
+        <div class="shape shape-circle"></div>
+        <div class="shape shape-square"></div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app-container">
+        
+        <!-- ==============================
+             ROLE SELECTION SCREEN
+        =============================== -->
+        <section id="role-screen" class="screen active">
+            <div class="join-panel">
+                <h1 class="kahoot-title">ODS 4 <span>Quiz</span></h1>
+                <p class="join-instruction">Como você deseja jogar?</p>
+                <div class="pin-input-group mt-20">
+                    <button id="btn-role-host" class="btn-kahoot-secondary">Sou o Professor (Criar Sala Host)</button>
+                    <button id="btn-role-player" class="btn-kahoot-primary">Sou Aluno (Entrar no Jogo)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================
+             HOST SCREENS
+        =============================== -->
+        
+        <!-- HOST: LOBBY -->
+        <section id="host-lobby-screen" class="screen">
+            <div class="host-top-bar">
+                <div class="pin-display">PIN do Jogo: <span id="host-pin-display">000000</span></div>
+                <div class="player-count">Jogadores: <span id="host-player-count">0</span></div>
+            </div>
+            
+            <div class="host-lobby-content">
+                <div class="qr-container-large">
+                    <p>Use a câmera ou acesse com o PIN!</p>
+                    <img id="host-qr-img" src="" alt="QR Code" class="qr-image-large">
+                </div>
+                
+                <div class="players-grid" id="host-players-list">
+                    <!-- Nomes dos jogadores aparecem aqui -->
+                </div>
+            </div>
+
+            <button id="btn-host-start" class="btn-kahoot-primary host-start-btn">Iniciar Jogo</button>
+        </section>
+
+        <!-- HOST: QUESTION VIEW -->
+        <section id="host-quiz-screen" class="screen">
+            <div class="question-container-host">
+                <span class="question-counter">Pergunta <span id="host-current-q">1</span> de 20</span>
+                <h2 id="host-question-text">Pergunta...</h2>
+            </div>
+            
+            <div class="options-grid-host" id="host-options-grid">
+                <!-- Opções com texto para o host -->
+                <div class="host-opt opt-0"><div class="shape-icon"></div> <span id="host-opt-0-text">Opção A</span></div>
+                <div class="host-opt opt-1"><div class="shape-icon"></div> <span id="host-opt-1-text">Opção B</span></div>
+                <div class="host-opt opt-2"><div class="shape-icon"></div> <span id="host-opt-2-text">Opção C</span></div>
+                <div class="host-opt opt-3"><div class="shape-icon"></div> <span id="host-opt-3-text">Opção D</span></div>
+            </div>
+        </section>
+
+        <!-- HOST: LEADERBOARD / RESULTS -->
+        <section id="host-results-screen" class="screen">
+            <div class="join-panel results-panel" style="max-width: 800px;">
+                <h1 class="kahoot-title">Pódio Final! 🏆</h1>
+                <div id="host-podium-list" class="podium-list">
+                    <!-- Leaderboard -->
+                </div>
+                <button class="btn-kahoot-primary mt-20" id="btn-host-reset">Fechar Sala e Voltar</button>
+            </div>
+        </section>
+
+        <!-- ==============================
+             PLAYER SCREENS
+        =============================== -->
+
+        <!-- PLAYER: JOIN -->
+        <section id="player-join-screen" class="screen">
+            <div class="join-panel">
+                <h1 class="kahoot-title">ODS 4 <span>Quiz</span></h1>
+                
+                <div id="player-pin-step">
+                    <div class="pin-input-group">
+                        <input type="text" id="player-pin" placeholder="PIN do Jogo" maxlength="6" autocomplete="off">
+                        <button id="btn-player-enter-pin" class="btn-kahoot-primary">Entrar</button>
+                    </div>
+                </div>
+
+                <div id="player-nick-step" style="display: none;">
+                    <div class="pin-input-group">
+                        <input type="text" id="player-nickname" placeholder="Seu apelido" maxlength="15" autocomplete="off">
+                        <button id="btn-player-enter-nick" class="btn-kahoot-primary">Pronto, vamos lá!</button>
+                    </div>
+                </div>
+                <div id="player-join-error" class="error-msg"></div>
+            </div>
+        </section>
+
+        <!-- PLAYER: WAITING LOBBY -->
+        <section id="player-waiting-screen" class="screen">
+            <div class="join-panel">
+                <h2 style="font-family: var(--font-heading); color: var(--text-dark);">Você entrou!</h2>
+                <p class="mt-20" style="font-size: 1.2rem;">Veja seu nickname na tela principal.<br>Aguarde o professor iniciar.</p>
+                <div class="loader" style="border-top-color: var(--primary); margin: 30px auto;"></div>
+            </div>
+        </section>
+
+        <!-- PLAYER: GAMEPAD (Shapes only) -->
+        <section id="player-gamepad-screen" class="screen">
+            <!-- Header for player score -->
+            <div style="background: rgba(0,0,0,0.1); padding: 10px; text-align: center; font-weight: bold; margin-bottom: 10px; border-radius: 8px;">
+                <span id="player-score-display">0</span> pts
+            </div>
+            
+            <!-- Grid 2x2 filling the screen with only shapes -->
+            <div class="options-grid-player">
+                <button class="player-opt opt-0" data-idx="0"><div class="shape-icon-large"></div></button>
+                <button class="player-opt opt-1" data-idx="1"><div class="shape-icon-large"></div></button>
+                <button class="player-opt opt-2" data-idx="2"><div class="shape-icon-large"></div></button>
+                <button class="player-opt opt-3" data-idx="3"><div class="shape-icon-large"></div></button>
+            </div>
+        </section>
+
+        <!-- PLAYER: FEEDBACK -->
+        <section id="player-feedback-screen" class="screen">
+            <div id="player-feedback-bg" class="full-bg-overlay bg-loading">
+                <div class="feedback-content">
+                    <div id="player-feedback-icon" class="icon-container">
+                        <div class="loader"></div>
+                    </div>
+                    <h2 id="player-feedback-title">Aguardando resultado...</h2>
+                    <p id="player-points-earned" style="font-size: 1.5rem; font-weight: 800; margin-top: 10px; color: white;"></p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
