@@ -59,6 +59,8 @@ let currentPin = '';
 
 // The authoritative state kept by the HOST
 let hostRoomState = null;
+let questionTimerInterval = null;
+let currentQuestionTimeLeft = 20;
 
 function getEmptyRoom(pin) {
     return {
@@ -156,8 +158,7 @@ function updateHostUI() {
         if(pNames.length > 0) {
             const allAnswered = pNames.every(p => hostRoomState.players[p].hasAnswered);
             if(allAnswered) {
-                // Para não avançar instantaneamente antes do aluno ver o feedback final, dá um delay
-                setTimeout(() => hostNextQuestion(), 3000);
+                hostShowAnswer();
             }
         }
     }
@@ -182,9 +183,17 @@ function hostLoadQuestion() {
     Object.keys(hostRoomState.players).forEach(p => {
         hostRoomState.players[p].hasAnswered = false;
         hostRoomState.players[p].lastPoints = 0;
+        hostRoomState.players[p].isCorrect = false;
     });
 
     syncStateToPlayers();
+
+    document.getElementById('btn-host-next').style.display = 'none';
+
+    for(let i=0; i<4; i++) {
+        const optEl = document.getElementById(`host-opt-container-${i}`);
+        if(optEl) optEl.style.opacity = '1';
+    }
 
     hostCurrentQ.textContent = hostRoomState.currentQuestionIndex + 1;
     hostQuestionText.textContent = qData.question;
@@ -192,8 +201,51 @@ function hostLoadQuestion() {
         hostOptTexts[idx].textContent = opt;
     });
     
+    currentQuestionTimeLeft = 20;
+    const timerDisplay = document.getElementById('host-timer');
+    if(timerDisplay) timerDisplay.textContent = currentQuestionTimeLeft;
+    
+    clearInterval(questionTimerInterval);
+    questionTimerInterval = setInterval(() => {
+        currentQuestionTimeLeft--;
+        if(timerDisplay) timerDisplay.textContent = currentQuestionTimeLeft;
+        
+        if(currentQuestionTimeLeft <= 0) {
+            hostShowAnswer();
+        }
+    }, 1000);
+
     showScreen(hostQuizScreen);
 }
+
+function hostShowAnswer() {
+    if(hostRoomState.status === 'show_answer') return; // Evita múltiplas chamadas
+    clearInterval(questionTimerInterval);
+    
+    // Quem não respondeu fica com erro e 0 pontos
+    Object.keys(hostRoomState.players).forEach(p => {
+        if(!hostRoomState.players[p].hasAnswered) {
+            hostRoomState.players[p].hasAnswered = true;
+            hostRoomState.players[p].lastPoints = 0;
+            hostRoomState.players[p].isCorrect = false;
+        }
+    });
+    
+    hostRoomState.status = 'show_answer';
+    syncStateToPlayers();
+    
+    // Destacar opção correta no Host
+    for(let i=0; i<4; i++) {
+        const optEl = document.getElementById(`host-opt-container-${i}`);
+        if(optEl && i !== hostRoomState.correctIndex) {
+            optEl.style.opacity = '0.3';
+        }
+    }
+    
+    document.getElementById('btn-host-next').style.display = 'block';
+}
+
+document.getElementById('btn-host-next').addEventListener('click', hostNextQuestion);
 
 function hostNextQuestion() {
     hostRoomState.currentQuestionIndex++;
@@ -328,7 +380,7 @@ socket.on('state_updated', (room) => {
     if(isHost || !localPlayerNick) return;
     const myData = room.players[localPlayerNick];
     
-    if(room.status === 'question' && myData.hasAnswered) {
+    if((room.status === 'question' || room.status === 'show_answer') && myData.hasAnswered) {
         showScreen(playerFeedbackScreen);
         if (myData.isCorrect) {
             playerFeedbackBg.className = 'full-bg-overlay bg-correct';
@@ -338,7 +390,8 @@ socket.on('state_updated', (room) => {
         } else {
             playerFeedbackBg.className = 'full-bg-overlay bg-incorrect';
             playerFeedbackIcon.innerHTML = ICON_INCORRECT;
-            playerFeedbackTitle.textContent = "Incorreto!";
+            // Se o status for show_answer e ele ganhou 0 pontos sem ter clicado antes, foi tempo esgotado.
+            playerFeedbackTitle.textContent = myData.lastPoints === 0 ? "Incorreto / Tempo Esgotado" : "Incorreto!";
             playerPointsEarned.textContent = "Não desanime!";
         }
     }

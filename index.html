@@ -64,17 +64,24 @@
         <!-- HOST: QUESTION VIEW -->
         <section id="host-quiz-screen" class="screen">
             <div class="question-container-host">
-                <span class="question-counter">Pergunta <span id="host-current-q">1</span> de 20</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="question-counter">Pergunta <span id="host-current-q">1</span> de 20</span>
+                    <div style="background: var(--bg-light); padding: 5px 20px; border-radius: 20px; font-size: 2rem; font-weight: 900; color: var(--error);">
+                        <span id="host-timer">20</span>s
+                    </div>
+                </div>
                 <h2 id="host-question-text">Pergunta...</h2>
             </div>
             
             <div class="options-grid-host" id="host-options-grid">
                 <!-- Opções com texto para o host -->
-                <div class="host-opt opt-0"><div class="shape-icon"></div> <span id="host-opt-0-text">Opção A</span></div>
-                <div class="host-opt opt-1"><div class="shape-icon"></div> <span id="host-opt-1-text">Opção B</span></div>
-                <div class="host-opt opt-2"><div class="shape-icon"></div> <span id="host-opt-2-text">Opção C</span></div>
-                <div class="host-opt opt-3"><div class="shape-icon"></div> <span id="host-opt-3-text">Opção D</span></div>
+                <div class="host-opt opt-0" id="host-opt-container-0"><div class="shape-icon"></div> <span id="host-opt-0-text">Opção A</span></div>
+                <div class="host-opt opt-1" id="host-opt-container-1"><div class="shape-icon"></div> <span id="host-opt-1-text">Opção B</span></div>
+                <div class="host-opt opt-2" id="host-opt-container-2"><div class="shape-icon"></div> <span id="host-opt-2-text">Opção C</span></div>
+                <div class="host-opt opt-3" id="host-opt-container-3"><div class="shape-icon"></div> <span id="host-opt-3-text">Opção D</span></div>
             </div>
+
+            <button id="btn-host-next" class="btn-kahoot-primary host-start-btn" style="display: none;">Próxima Pergunta</button>
         </section>
 
         <!-- HOST: LEADERBOARD / RESULTS -->
