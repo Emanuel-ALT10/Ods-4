@@ -23,6 +23,10 @@ const hostOptTexts = [
     document.getElementById('host-opt-3-text')
 ];
 
+const hostIntermediateLeaderboardScreen = document.getElementById('host-intermediate-leaderboard-screen');
+const hostIntermediatePodiumList = document.getElementById('host-intermediate-podium-list');
+const btnHostNextFromLeaderboard = document.getElementById('btn-host-next-from-leaderboard');
+
 const hostResultsScreen = document.getElementById('host-results-screen');
 const hostPodiumList = document.getElementById('host-podium-list');
 const btnHostReset = document.getElementById('btn-host-reset');
@@ -245,7 +249,26 @@ function hostShowAnswer() {
     document.getElementById('btn-host-next').style.display = 'block';
 }
 
-document.getElementById('btn-host-next').addEventListener('click', hostNextQuestion);
+document.getElementById('btn-host-next').addEventListener('click', hostShowIntermediateLeaderboard);
+
+function hostShowIntermediateLeaderboard() {
+    hostRoomState.status = 'intermediate_leaderboard';
+    syncStateToPlayers();
+    
+    const sortedPlayers = Object.entries(hostRoomState.players).sort((a,b) => b[1].score - a[1].score);
+    const topPlayers = sortedPlayers.slice(0, 5); // Mostra os top 5
+    
+    hostIntermediatePodiumList.innerHTML = topPlayers.map((p, idx) => `
+        <div class="podium-item">
+            <span>${idx+1}º ${p[0]}</span>
+            <span>${p[1].score} pts</span>
+        </div>
+    `).join('');
+    
+    showScreen(hostIntermediateLeaderboardScreen);
+}
+
+btnHostNextFromLeaderboard.addEventListener('click', hostNextQuestion);
 
 function hostNextQuestion() {
     hostRoomState.currentQuestionIndex++;
@@ -380,7 +403,7 @@ socket.on('state_updated', (room) => {
     if(isHost || !localPlayerNick) return;
     const myData = room.players[localPlayerNick];
     
-    if((room.status === 'question' || room.status === 'show_answer') && myData.hasAnswered) {
+    if((room.status === 'question' || room.status === 'show_answer' || room.status === 'intermediate_leaderboard') && myData.hasAnswered) {
         showScreen(playerFeedbackScreen);
         if (myData.isCorrect) {
             playerFeedbackBg.className = 'full-bg-overlay bg-correct';
