@@ -274,6 +274,21 @@ socket.on('state_updated', (room) => {
     else if (room.status === 'question') {
         if (!myData.hasAnswered) {
             showScreen(playerGamepadScreen);
+
+            // Popula a pergunta e as opções na tela do aluno
+            const qData = quizQuestions[room.currentQuestionIndex];
+            document.getElementById('player-question-text').textContent = qData.question;
+            
+            const playerOptTexts = [
+                document.getElementById('player-opt-0-text'),
+                document.getElementById('player-opt-1-text'),
+                document.getElementById('player-opt-2-text'),
+                document.getElementById('player-opt-3-text')
+            ];
+            
+            qData.options.forEach((opt, idx) => {
+                if(playerOptTexts[idx]) playerOptTexts[idx].textContent = opt;
+            });
         }
     }
     else if (room.status === 'leaderboard') {

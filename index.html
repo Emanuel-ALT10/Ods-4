@@ -123,19 +123,35 @@
             </div>
         </section>
 
-        <!-- PLAYER: GAMEPAD (Shapes only) -->
+        <!-- PLAYER: GAMEPAD -->
         <section id="player-gamepad-screen" class="screen">
             <!-- Header for player score -->
             <div style="background: rgba(0,0,0,0.1); padding: 10px; text-align: center; font-weight: bold; margin-bottom: 10px; border-radius: 8px;">
                 <span id="player-score-display">0</span> pts
             </div>
+
+            <div class="question-container-player" style="margin-bottom: 15px; text-align: center; background: white; padding: 15px; border-radius: var(--radius-md); box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3 id="player-question-text" style="color: var(--text-dark); font-family: var(--font-heading); font-size: 1.2rem;">Pergunta...</h3>
+            </div>
             
-            <!-- Grid 2x2 filling the screen with only shapes -->
+            <!-- Grid 2x2 filling the screen with shapes and text -->
             <div class="options-grid-player">
-                <button class="player-opt opt-0" data-idx="0"><div class="shape-icon-large"></div></button>
-                <button class="player-opt opt-1" data-idx="1"><div class="shape-icon-large"></div></button>
-                <button class="player-opt opt-2" data-idx="2"><div class="shape-icon-large"></div></button>
-                <button class="player-opt opt-3" data-idx="3"><div class="shape-icon-large"></div></button>
+                <button class="player-opt opt-0" data-idx="0">
+                    <div class="shape-icon-large"></div>
+                    <span id="player-opt-0-text" class="opt-text-player">Opção A</span>
+                </button>
+                <button class="player-opt opt-1" data-idx="1">
+                    <div class="shape-icon-large"></div>
+                    <span id="player-opt-1-text" class="opt-text-player">Opção B</span>
+                </button>
+                <button class="player-opt opt-2" data-idx="2">
+                    <div class="shape-icon-large"></div>
+                    <span id="player-opt-2-text" class="opt-text-player">Opção C</span>
+                </button>
+                <button class="player-opt opt-3" data-idx="3">
+                    <div class="shape-icon-large"></div>
+                    <span id="player-opt-3-text" class="opt-text-player">Opção D</span>
+                </button>
             </div>
         </section>
 
