@@ -64,7 +64,7 @@ let currentPin = '';
 // The authoritative state kept by the HOST
 let hostRoomState = null;
 let questionTimerInterval = null;
-let currentQuestionTimeLeft = 20;
+let currentQuestionTimeLeft = 50;
 
 function getEmptyRoom(pin) {
     return {
@@ -179,6 +179,7 @@ btnHostStart.addEventListener('click', () => {
 });
 
 function hostLoadQuestion() {
+    hostRoomState.status = 'question'; // Força o estado para question ao carregar nova pergunta
     const qData = quizQuestions[hostRoomState.currentQuestionIndex];
     hostRoomState.questionStartTime = Date.now();
     hostRoomState.correctIndex = qData.correctIndex;
@@ -205,7 +206,7 @@ function hostLoadQuestion() {
         hostOptTexts[idx].textContent = opt;
     });
     
-    currentQuestionTimeLeft = 20;
+    currentQuestionTimeLeft = 50;
     const timerDisplay = document.getElementById('host-timer');
     if(timerDisplay) timerDisplay.textContent = currentQuestionTimeLeft;
     
