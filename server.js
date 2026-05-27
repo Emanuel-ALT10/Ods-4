@@ -46,6 +46,14 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Jogador envia emoji
+    socket.on('player_send_emoji', (data) => {
+        const { pin, emoji } = data;
+        if(rooms[pin]) {
+            io.to(rooms[pin]).emit('show_emoji', { emoji });
+        }
+    });
+
 });
 
 const PORT = process.env.PORT || 3000;

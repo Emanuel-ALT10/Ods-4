@@ -110,9 +110,9 @@ function initHost() {
 // Quando alguém entra na sala
 socket.on('player_req_join', (data) => {
     if(!isHost) return;
-    const { nick } = data;
+    const { nick, avatar } = data;
     if(!hostRoomState.players[nick]) {
-        hostRoomState.players[nick] = { score: 0, hasAnswered: false, lastPoints: 0, isCorrect: false };
+        hostRoomState.players[nick] = { score: 0, hasAnswered: false, lastPoints: 0, isCorrect: false, avatar: avatar || '👤' };
         updateHostUI();
         syncStateToPlayers();
     }
@@ -154,7 +154,7 @@ function updateHostUI() {
     if (hostRoomState.status === 'lobby') {
         const pNames = Object.keys(hostRoomState.players);
         hostPlayerCount.textContent = pNames.length;
-        hostPlayersList.innerHTML = pNames.map(p => `<div class="player-chip">${p}</div>`).join('');
+        hostPlayersList.innerHTML = pNames.map(p => `<div class="player-chip">${hostRoomState.players[p].avatar || '👤'} ${p}</div>`).join('');
     }
     
     if (hostRoomState.status === 'question') {
@@ -261,7 +261,7 @@ function hostShowIntermediateLeaderboard() {
     
     hostIntermediatePodiumList.innerHTML = topPlayers.map((p, idx) => `
         <div class="podium-item">
-            <span>${idx+1}º ${p[0]}</span>
+            <span>${idx+1}º ${p[1].avatar || '👤'} ${p[0]}</span>
             <span>${p[1].score} pts</span>
         </div>
     `).join('');
@@ -281,7 +281,7 @@ function hostNextQuestion() {
         const sortedPlayers = Object.entries(hostRoomState.players).sort((a,b) => b[1].score - a[1].score);
         hostPodiumList.innerHTML = sortedPlayers.map((p, idx) => `
             <div class="podium-item">
-                <span>${idx+1}º ${p[0]}</span>
+                <span>${idx+1}º ${p[1].avatar || '👤'} ${p[0]}</span>
                 <span>${p[1].score} pts</span>
             </div>
         `).join('');
@@ -317,6 +317,16 @@ btnPlayerEnterPin.addEventListener('click', () => {
     playerNickStep.style.display = 'block';
 });
 
+// Avatar Selection
+let selectedAvatar = '🐶';
+document.querySelectorAll('.avatar-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedAvatar = opt.dataset.avatar;
+    });
+});
+
 btnPlayerEnterNick.addEventListener('click', () => {
     const nick = playerNickInput.value.trim();
     if(nick.length === 0) {
@@ -324,12 +334,14 @@ btnPlayerEnterNick.addEventListener('click', () => {
         return;
     }
     
-    socket.emit('join_room', { pin: currentPin, nick: nick }, (response) => {
+    socket.emit('join_room', { pin: currentPin, nick: nick, avatar: selectedAvatar }, (response) => {
         if(response.error) {
             playerJoinError.textContent = response.error;
         } else {
             localPlayerNick = nick;
             showScreen(playerWaitingScreen);
+            const emojiBar = document.getElementById('player-emoji-bar');
+            if(emojiBar) emojiBar.style.display = 'flex';
         }
     });
 });
@@ -420,3 +432,31 @@ socket.on('state_updated', (room) => {
         }
     }
 });
+
+// ==========================================
+// EMOJI LOGIC
+// ==========================================
+
+document.querySelectorAll('.emoji-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const emoji = btn.dataset.emoji;
+        socket.emit('player_send_emoji', { pin: currentPin, emoji: emoji });
+        createFloatingEmoji(emoji, window.innerWidth / 2, window.innerHeight - 80);
+    });
+});
+
+socket.on('show_emoji', (data) => {
+    if(!isHost) return;
+    const x = Math.random() * (window.innerWidth - 100) + 50;
+    createFloatingEmoji(data.emoji, x, window.innerHeight);
+});
+
+function createFloatingEmoji(emoji, x, y) {
+    const el = document.createElement('div');
+    el.className = 'floating-emoji';
+    el.textContent = emoji;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+}

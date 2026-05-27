@@ -123,6 +123,17 @@
                 </div>
 
                 <div id="player-nick-step" style="display: none;">
+                    <div class="avatar-selector" style="margin-bottom: 20px;">
+                        <p style="font-weight: bold; margin-bottom: 10px; color: var(--text-dark);">Escolha seu avatar:</p>
+                        <div class="avatar-grid" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <div class="avatar-option selected" data-avatar="🐶">🐶</div>
+                            <div class="avatar-option" data-avatar="🐱">🐱</div>
+                            <div class="avatar-option" data-avatar="🦊">🦊</div>
+                            <div class="avatar-option" data-avatar="🐰">🐰</div>
+                            <div class="avatar-option" data-avatar="🐼">🐼</div>
+                            <div class="avatar-option" data-avatar="🐯">🐯</div>
+                        </div>
+                    </div>
                     <div class="pin-input-group">
                         <input type="text" id="player-nickname" placeholder="Seu apelido" maxlength="15" autocomplete="off">
                         <button id="btn-player-enter-nick" class="btn-kahoot-primary">Pronto, vamos lá!</button>
@@ -185,6 +196,14 @@
                 </div>
             </div>
         </section>
+
+        <!-- PLAYER: EMOJI BAR -->
+        <div id="player-emoji-bar" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); gap: 15px; z-index: 1000;">
+            <button class="emoji-btn" data-emoji="👍">👍</button>
+            <button class="emoji-btn" data-emoji="❤️">❤️</button>
+            <button class="emoji-btn" data-emoji="😂">😂</button>
+            <button class="emoji-btn" data-emoji="😮">😮</button>
+        </div>
 
     </div>
 
