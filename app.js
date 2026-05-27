@@ -65,6 +65,7 @@ let currentPin = '';
 let hostRoomState = null;
 let questionTimerInterval = null;
 let currentQuestionTimeLeft = 50;
+let previousScores = {};
 
 function getEmptyRoom(pin) {
     return {
@@ -293,14 +294,65 @@ function hostShowIntermediateLeaderboard() {
     const sortedPlayers = Object.entries(hostRoomState.players).sort((a,b) => b[1].score - a[1].score);
     const topPlayers = sortedPlayers.slice(0, 5); // Mostra os top 5
     
-    hostIntermediatePodiumList.innerHTML = topPlayers.map((p, idx) => `
-        <div class="podium-item">
-            <span>${idx+1}º ${p[1].avatar || '👤'} ${p[0]}</span>
-            <span>${p[1].score} pts</span>
-        </div>
-    `).join('');
+    renderLeaderboard(hostIntermediatePodiumList, topPlayers);
     
     showScreen(hostIntermediateLeaderboardScreen);
+}
+
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start) + ' pts';
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+function renderLeaderboard(container, playersArray) {
+    container.style.height = `${playersArray.length * 75}px`; // 60px height + 15px gap
+    
+    const currentIds = playersArray.map(p => `podium-item-${p[0]}`);
+    
+    Array.from(container.children).forEach(child => {
+        if (!currentIds.includes(child.id)) {
+            child.remove();
+        }
+    });
+    
+    playersArray.forEach((p, idx) => {
+        const nick = p[0];
+        const data = p[1];
+        const prevScore = previousScores[nick] || 0;
+        
+        let el = document.getElementById(`podium-item-${nick}`);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = `podium-item-${nick}`;
+            el.className = 'podium-item';
+            el.innerHTML = `
+                <span class="podium-name"></span>
+                <span class="podium-score">0 pts</span>
+            `;
+            el.style.top = `${playersArray.length * 75}px`;
+            container.appendChild(el);
+            
+            el.getBoundingClientRect(); // forçar reflow
+        }
+        
+        el.style.top = `${idx * 75}px`;
+        el.querySelector('.podium-name').textContent = `${idx+1}º ${data.avatar || '👤'} ${nick}`;
+        
+        if (prevScore !== data.score) {
+            animateValue(el.querySelector('.podium-score'), prevScore, data.score, 1500);
+            previousScores[nick] = data.score;
+        } else {
+            el.querySelector('.podium-score').textContent = `${data.score} pts`;
+        }
+    });
 }
 
 btnHostNextFromLeaderboard.addEventListener('click', hostNextQuestion);
@@ -313,12 +365,7 @@ function hostNextQuestion() {
         syncStateToPlayers();
         
         const sortedPlayers = Object.entries(hostRoomState.players).sort((a,b) => b[1].score - a[1].score);
-        hostPodiumList.innerHTML = sortedPlayers.map((p, idx) => `
-            <div class="podium-item">
-                <span>${idx+1}º ${p[1].avatar || '👤'} ${p[0]}</span>
-                <span>${p[1].score} pts</span>
-            </div>
-        `).join('');
+        renderLeaderboard(hostPodiumList, sortedPlayers);
         
         showScreen(hostResultsScreen);
     } else {
