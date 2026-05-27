@@ -493,6 +493,19 @@ body {
     pointer-events: none;
     animation: floatUp 2s ease-out forwards;
     z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.floating-emoji-name {
+    font-size: 0.9rem;
+    font-family: var(--font-heading);
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
 }
 @keyframes floatUp {
     0% { transform: translateY(0) scale(0.5); opacity: 0; }

@@ -48,9 +48,9 @@ io.on('connection', (socket) => {
 
     // Jogador envia emoji
     socket.on('player_send_emoji', (data) => {
-        const { pin, emoji } = data;
+        const { pin, emoji, nick } = data;
         if(rooms[pin]) {
-            io.to(rooms[pin]).emit('show_emoji', { emoji });
+            io.to(rooms[pin]).emit('show_emoji', { emoji, nick });
         }
     });
 

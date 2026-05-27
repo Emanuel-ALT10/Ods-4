@@ -83,10 +83,44 @@ function showScreen(screen) {
 }
 
 // ==========================================
+// BACKGROUND MUSIC
+// ==========================================
+const bgMusic = document.getElementById('bg-music');
+const btnToggleMusic = document.getElementById('btn-toggle-music');
+let isMusicPlaying = false;
+
+function playBgMusic() {
+    bgMusic.volume = 0.3; // Volume agradável
+    bgMusic.play().then(() => {
+        isMusicPlaying = true;
+        btnToggleMusic.style.display = 'flex';
+        btnToggleMusic.textContent = '🔊';
+    }).catch(e => console.log('Autoplay bloqueado pelo navegador', e));
+}
+
+btnToggleMusic.addEventListener('click', () => {
+    if (isMusicPlaying) {
+        bgMusic.pause();
+        btnToggleMusic.textContent = '🔇';
+    } else {
+        bgMusic.play();
+        btnToggleMusic.textContent = '🔊';
+    }
+    isMusicPlaying = !isMusicPlaying;
+});
+
+// ==========================================
 // INITIAL SETUP
 // ==========================================
-btnRoleHost.addEventListener('click', initHost);
-btnRolePlayer.addEventListener('click', () => showScreen(playerJoinScreen));
+btnRoleHost.addEventListener('click', () => {
+    playBgMusic();
+    initHost();
+});
+
+btnRolePlayer.addEventListener('click', () => {
+    playBgMusic();
+    showScreen(playerJoinScreen);
+});
 
 // ==========================================
 // HOST LOGIC
@@ -440,21 +474,31 @@ socket.on('state_updated', (room) => {
 document.querySelectorAll('.emoji-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const emoji = btn.dataset.emoji;
-        socket.emit('player_send_emoji', { pin: currentPin, emoji: emoji });
-        createFloatingEmoji(emoji, window.innerWidth / 2, window.innerHeight - 80);
+        socket.emit('player_send_emoji', { pin: currentPin, emoji: emoji, nick: localPlayerNick });
+        createFloatingEmoji(emoji, localPlayerNick, window.innerWidth / 2, window.innerHeight - 80);
     });
 });
 
 socket.on('show_emoji', (data) => {
     if(!isHost) return;
     const x = Math.random() * (window.innerWidth - 100) + 50;
-    createFloatingEmoji(data.emoji, x, window.innerHeight);
+    createFloatingEmoji(data.emoji, data.nick, x, window.innerHeight);
 });
 
-function createFloatingEmoji(emoji, x, y) {
+function createFloatingEmoji(emoji, nick, x, y) {
     const el = document.createElement('div');
     el.className = 'floating-emoji';
-    el.textContent = emoji;
+    
+    const emojiSpan = document.createElement('div');
+    emojiSpan.textContent = emoji;
+    
+    const nameSpan = document.createElement('div');
+    nameSpan.className = 'floating-emoji-name';
+    nameSpan.textContent = nick || '';
+    
+    el.appendChild(emojiSpan);
+    if(nick) el.appendChild(nameSpan);
+    
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
     document.body.appendChild(el);
