@@ -20,11 +20,11 @@ io.on('connection', (socket) => {
 
     // Jogador tenta entrar
     socket.on('join_room', (data, callback) => {
-        const { pin, nick } = data;
+        const { pin, nick, avatar } = data;
         if(rooms[pin]) {
             socket.join(pin);
             // Avisa o host que alguém quer entrar
-            io.to(rooms[pin]).emit('player_req_join', { nick, socketId: socket.id });
+            io.to(rooms[pin]).emit('player_req_join', { nick, avatar, socketId: socket.id });
             callback({ success: true });
         } else {
             callback({ error: 'PIN Inválido ou Sala Fechada.' });
